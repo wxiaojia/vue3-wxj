@@ -1,0 +1,11 @@
+{
+    "scope": [],
+    "type": 7,
+    "id": "",
+    "stepId": "",
+    "echo": {
+        "type": 0,
+        "column": [],
+        "condition": []
+    }
+}

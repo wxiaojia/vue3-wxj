@@ -1,0 +1,521 @@
+{
+    "desc": "Canvas资源&配置&参数",
+    "canvas": {
+        "fillStyle": "#f7f9ff"
+    },
+	"resultSetStatus": {
+		"noClick": ["1", "2"]
+    },
+	"getDelayTime": 3000,
+    "getAllTime": 2000,
+    "relationMapping": {
+        "inSec": "3",
+        "leftJoin": "4",
+        "rightJoin": "5",
+        "leftOut": "6",
+        "rightOut": "7",
+        "pubOut": "8",
+        "unionAll": "10"
+    },
+    "relation": {
+        "inSec": {
+            "src": "static/img/src/assets/img/dmc/analys/icons.png",
+            "sx": 0,
+            "sy": 103,
+            "sw": 80,
+            "sh": 53,
+            "x": 0,
+            "y": 0,
+            "w": 80,
+            "h": 53
+        },
+        "pubOut": {
+            "src": "static/img/src/assets/img/dmc/analys/icons.png",
+            "sx": 0,
+            "sy": 162,
+            "sw": 80,
+            "sh": 53,
+            "x": 0,
+            "y": 0,
+            "w": 80,
+            "h": 53
+        },
+        "rightJoin": {
+            "src": "static/img/src/assets/img/dmc/analys/icons.png",
+            "sx": 0,
+            "sy": 219,
+            "sw": 80,
+            "sh": 53,
+            "x": 0,
+            "y": 0,
+            "w": 80,
+            "h": 53
+        },
+        "rightOut": {
+            "src": "static/img/src/assets/img/dmc/analys/icons.png",
+            "sx": 0,
+            "sy": 277,
+            "sw": 80,
+            "sh": 53,
+            "x": 0,
+            "y": 0,
+            "w": 80,
+            "h": 53
+        },
+        "leftJoin": {
+            "src": "static/img/src/assets/img/dmc/analys/icons.png",
+            "sx": 0,
+            "sy": 335,
+            "sw": 80,
+            "sh": 53,
+            "x": 0,
+            "y": 0,
+            "w": 80,
+            "h": 53
+        },
+        "leftOut": {
+            "src": "static/img/src/assets/img/dmc/analys/icons.png",
+            "sx": 0,
+            "sy": 393,
+            "sw": 80,
+            "sh": 53,
+            "x": 0,
+            "y": 0,
+            "w": 80,
+            "h": 53
+        },
+        "unionAll": {
+            "src": "static/img/src/assets/img/dmc/analys/icons.png",
+            "sx": 0,
+            "sy": 451,
+            "sw": 80,
+            "sh": 53,
+            "x": 0,
+            "y": 0,
+            "w": 80,
+            "h": 53
+        },
+        "stopRun": {
+            "src": "static/img/src/assets/img/liuxiantu/40.png",
+            "sx": 0,
+            "sy": 0,
+            "sw": 24,
+            "sh": 24,
+            "x": 0,
+            "y": 0,
+            "w": 16,
+            "h": 16
+        },
+        "delete" : {
+        	"dataSource": {
+        		"src": "static/img/src/assets/img/dmc/analys/icons.png",
+	            "sx": 5,
+	            "sy": 0,
+	            "sw": 124,
+	            "sh": 45,
+	            "x": 0,
+	            "y": 0,
+	            "w": 124,
+	            "h": 45
+        	},
+        	"resultSet": {
+        		"src": "static/img/src/assets/img/dmc/analys/icons.png",
+	            "sx": 5,
+	            "sy": 50,
+	            "sw": 97,
+	            "sh": 46,
+	            "x": 0,
+	            "y": 0,
+	            "w": 97,
+	            "h": 46
+        	}
+        }
+    },
+    "resourceAdd": {
+        "src": "static/img/logo.png",
+        "sx": 0,
+        "sy": 509,
+        "sw": 119,
+        "sh": 53,
+        "x": 100,
+        "y": 100,
+        "w": 119,
+        "h": 53
+    },
+    "module": {
+        "dataSource": {
+        	"closeCircular": {
+        		"x": 129,
+	            "y": 9,
+	            "r": 8,
+	            "strokeStyle": "#808da1",
+            	"fillStyle": "#fff"
+        	},
+        	"closeLine": [{
+	            "strokeStyle": "#808da1",
+	            "moveTo": [133, 5],
+	            "lineTo": [125, 13]
+	        }, {
+	            "moveTo": [125, 5],
+	            "lineTo": [133, 13]
+	        }],
+            "lineCircular": {
+                "x": 135,
+                "y": [32, 37.5, 43, 43],
+                "r": 5,
+                "strokeStyle": "#fff",
+                "fillStyle": "#fff"
+            },
+            "w": 144,
+            "h": [54, 65, 76, 87],
+            "marginT": [31.5, 37, 42.5, 42.5],
+            "arrowW": 15,
+            "fillStyle": ["#4964ca", "#0e97ca", "#ff00ff"]
+        },
+        "condition": [{
+            "fillStyle": "#1a95e9",
+            "r": 30,
+            "font": "14px Microsoft yahei",
+            "fontParam": {
+                "fillStyle": "#fff",
+                "textAlign": "center",
+                "textBaseline": "middle",
+                "text": ["数据", "过滤"]
+            },
+            "dataFilterFontParam": [{
+                "font": "14px Microsoft yahei",
+                "fillStyle": "#1a95e9",
+                "textAlign": "start",
+                "textBaseline": "middle",
+                "text": "条件过滤"
+            }, {
+                "font": "14px Microsoft yahei",
+                "fillStyle": "#604dd9",
+                "textAlign": "start",
+                "textBaseline": "middle",
+                "text": "字段过滤"
+            }],
+            "x": 30,
+            "y": 30,
+            "w": 60,
+            "h": 60,
+            "closeCircular": {
+        		"x": 51.5,
+	            "y": 9,
+	            "r": 8,
+	            "strokeStyle": "#808da1",
+            	"fillStyle": "#fff"
+            },
+            "closeLine": [{
+	            "strokeStyle": "#808da1",
+	            "moveTo": [47.5, 5],
+	            "lineTo": [55.5, 13]
+	        }, {
+	            "moveTo": [47.5, 13],
+	            "lineTo": [55.5, 5]
+	        }]
+        }, {
+            "fillStyle": "#21b9d5",
+            "r": 30,
+            "font": "14px Microsoft yahei",
+            "fontParam": {
+                "fillStyle": "#fff",
+                "textAlign": "center",
+                "textBaseline": "middle",
+                "text": ["分组", "统计"]
+            },
+            "x": 30,
+            "y": 30,
+            "w": 60,
+            "h": 60,
+            "closeCircular": {
+        		"x": 51.5,
+	            "y": 9,
+	            "r": 8,
+	            "strokeStyle": "#808da1",
+            	"fillStyle": "#fff"
+            },
+            "closeLine": [{
+	            "strokeStyle": "#808da1",
+	            "moveTo": [47.5, 5],
+	            "lineTo": [55.5, 13]
+	        }, {
+	            "moveTo": [47.5, 13],
+	            "lineTo": [55.5, 5]
+	        }]
+        }, {
+            "fillStyle": "#be46cc",
+            "r": 30,
+            "font": "14px Microsoft yahei",
+            "fontParam": {
+                "fillStyle": "#fff",
+                "textAlign": "center",
+                "textBaseline": "middle",
+                "text": ["全表", "统计"]
+            },
+            "x": 30,
+            "y": 30,
+            "w": 60,
+            "h": 60,
+            "closeCircular": {
+        		"x": 51.5,
+	            "y": 9,
+	            "r": 8,
+	            "strokeStyle": "#808da1",
+            	"fillStyle": "#fff"
+            },
+            "closeLine": [{
+	            "strokeStyle": "#808da1",
+	            "moveTo": [47.5, 5],
+	            "lineTo": [55.5, 13]
+	        }, {
+	            "moveTo": [47.5, 13],
+	            "lineTo": [55.5, 5]
+	        }]
+        }, {
+            "fillStyle": "#604dd9",
+            "r": 30,
+            "font": "14px Microsoft yahei",
+            "fontParam": {
+                "fillStyle": "#fff",
+                "textAlign": "center",
+                "textBaseline": "middle",
+                "text": ["数据", "去重"]
+            },
+            "x": 30,
+            "y": 30,
+            "w": 60,
+            "h": 60,
+            "closeCircular": {
+        		"x": 51.5,
+	            "y": 9,
+	            "r": 8,
+	            "strokeStyle": "#808da1",
+            	"fillStyle": "#fff"
+            },
+            "closeLine": [{
+	            "strokeStyle": "#808da1",
+	            "moveTo": [47.5, 5],
+	            "lineTo": [55.5, 13]
+	        }, {
+	            "moveTo": [47.5, 13],
+	            "lineTo": [55.5, 5]
+	        }]
+        }, {
+            "fillStyle": "#e6902b",
+            "r": 30,
+            "font": "14px Microsoft yahei",
+            "fontParam": {
+                "fillStyle": "#fff",
+                "textAlign": "center",
+                "textBaseline": "middle",
+                "text": ["数据", "去空"]
+            },
+            "x": 30,
+            "y": 30,
+            "w": 60,
+            "h": 60,
+            "closeCircular": {
+        		"x": 51.5,
+	            "y": 9,
+	            "r": 8,
+	            "strokeStyle": "#808da1",
+            	"fillStyle": "#fff"
+            },
+            "closeLine": [{
+	            "strokeStyle": "#808da1",
+	            "moveTo": [47.5, 5],
+	            "lineTo": [55.5, 13]
+	        }, {
+	            "moveTo": [47.5, 13],
+	            "lineTo": [55.5, 5]
+	        }]
+        }, {
+            "fillStyle": "#2fc336",
+            "r": 30,
+            "font": "14px Microsoft yahei",
+            "fontParam": {
+                "fillStyle": "#fff",
+                "textAlign": "center",
+                "textBaseline": "middle",
+                "text": ["新增", "字段"]
+            },
+            "x": 30,
+            "y": 30,
+            "w": 60,
+            "h": 60,
+            "closeCircular": {
+        		"x": 51.5,
+	            "y": 9,
+	            "r": 8,
+	            "strokeStyle": "#808da1",
+            	"fillStyle": "#fff"
+            },
+            "closeLine": [{
+	            "strokeStyle": "#808da1",
+	            "moveTo": [47.5, 5],
+	            "lineTo": [55.5, 13]
+	        }, {
+	            "moveTo": [47.5, 13],
+	            "lineTo": [55.5, 5]
+	        }]
+        }],
+        "triangle": [{
+            "moveTo": [129, 9],
+            "lineTo": [[144, 30], [144, 33], [129, 54], [129, 9]]
+        }, {
+            "moveTo": [129, 9],
+            "lineTo": [[144, 35.5], [144, 38.5], [129, 65], [129, 9]]
+        }, {
+            "moveTo": [129, 9],
+            "lineTo": [[144, 41], [144, 44], [129, 76], [129, 9]]
+        }, {
+            "moveTo": [129, 9],
+            "lineTo": [[144, 41], [144, 44], [129, 76], [129, 9]]
+        }],
+        "topTriangle": {
+            "moveTo": [129, 9],
+            "lineTo": [[129, 30], [144, 30]]
+        },
+        "relation": {
+            "textMaxH": 37
+        },
+        "centerArea": {
+            "x": 129,
+            "y": 29.5,
+            "w": 15,
+            "h": 4
+        },
+        "bottomTriangle": {
+            "moveTo": [129, 33],
+            "lineTo": [[129, 54], [144, 33]]
+        },
+        "resultSet": {
+            "strokeStyle": "#f4f4f4",
+            "fillStyles": ["#8b95bb", "#ff9933", "#ff9933", "#d16f4c", "#d16f4c", "#15b58d"],
+            "oldW-beifen": 129,
+            "w": 169,
+            "h": 84,
+            "gw": 160,
+            "gh": 46,
+            "y": 17,
+            "tableAliasNumber": {
+                "x": 24,
+                "y": 51,
+                "textAlign": "start",
+                "textBaseline": "bottom",
+                "fillStyle": "#fff",
+                "font": "10px Microsoft YaHei"
+            },
+            "tableAlias": {
+                "x": 10,
+                "y": 40,
+                "textAlign": "start",
+                "textBaseline": "middle",
+                "fillStyle": "#fff",
+                "font": "22px Microsoft YaHei"
+            },
+            "textX": 90,
+            "dateY": 77,
+            "countY": 52,
+            "marginT": 40,
+            "marginR": -9,
+            "hDetail": "46 + 17 + 21 46本身图形高度 17是运行状态文字高度 21是当前已运行时间的高度",
+            "dataType": 5,
+            "radius": 5,
+            "lineCircular": {
+                "x": 148,
+                "y": 40,
+                "r": 5,
+                "strokeStyle": "#808da1",
+                "fillStyle": "#fff"
+            },
+            "closeCircular": {
+        		"x": 160,
+	            "y": 17,
+	            "r": 8,
+	            "strokeStyle": "#808da1",
+            	"fillStyle": "#fff"
+        	},
+            "closeLine": [{
+                "strokeStyle": "#808da1",
+                "moveTo": [156, 21],
+                "lineTo": [164, 13]
+            }, {
+                "moveTo": [156, 13],
+                "lineTo": [164, 21]
+            }]
+        }
+    },
+    "lineParam": {
+        "fillStyle": "#2a3342"
+    },
+    "fontParam": {
+    	"runStatus": {
+    		"x": 50,
+            "y": -10,
+            "textAlign": "center",
+            "textBaseline": "middle",
+            "fillStyle": "#000",
+            "font": "12px Microsoft YaHei"
+    	},
+    	"tableAlias": {
+            "x": 10,
+            "y": [31.5, 37, 42.5, 42.5],
+            "textAlign": "center",
+            "textBaseline": "middle",
+            "fillStyle": "#fff",
+            "font": "22px Microsoft YaHei"
+    	},
+    	"tableAliasNumber": {
+    		"x": 13,
+            "y": [43, 48.5, 54, 54],
+            "textAlign": "start",
+            "textBaseline": "bottom",
+            "fillStyle": "#fff",
+            "font": "10px Microsoft YaHei"
+    	},
+    	"defaultText": {
+    		"textAlign": "center",
+            "textBaseline": "middle",
+            "fillStyle": "#000",
+            "font": "30px Microsoft YaHei"
+    	},
+    	"countDown": {
+		 	"textAlign": "center",
+            "textBaseline": "middle",
+            "fillStyle": "#000",
+            "font": "14px Microsoft YaHei"
+    	},
+        "title": {
+            "x": 74.5,
+            "y": 26,
+            "ys": [22, 37.5, 53, 53],
+            "textAlign": "center",
+            "textBaseline": "middle",
+            "fillStyle": "#fff",
+            "font": "14px Microsoft YaHei"
+        },
+        "countNumber": {
+            "x": 54.5,
+            "y": 44,
+            "ys": [44, 54, 65, 65],
+            "textAlign": "center",
+            "textBaseline": "middle",
+            "fillStyle": "#fff",
+            "font": "12px Microsoft YaHei"
+        },
+        "dataAnalys": {
+            "textAlign": "start",
+            "textBaseline": "top",
+            "fillStyle": "#333",
+            "font": "12px Microsoft YaHei"
+        },
+        "conditions": {
+            "textAlign": "center",
+            "textBaseline": "bottom",
+            "fillStyle": "#333",
+            "font": "12px Microsoft YaHei"
+        }
+    }
+}

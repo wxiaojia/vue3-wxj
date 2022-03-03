@@ -1,0 +1,16 @@
+{
+    "scope": [],
+    "type": 9,
+    "id": "",
+    "stepId": "",
+    "num": "",
+    "alias": "",
+    "marginT": 0,
+    "marginR": 0,
+    "echo": {
+        "lId": "",
+        "rId": "",
+        "result": [],
+        "relation": []
+    }
+}

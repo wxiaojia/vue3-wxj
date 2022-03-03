@@ -1,0 +1,17 @@
+{
+    "scope": [],
+    "type": 5,
+    "id": "",
+    "rType": "inSec",
+    "stepId": "",
+    "num": "",
+    "alias": "",
+    "marginT": 0,
+    "marginR": 0,
+    "echo": {
+        "lColumn": [],
+        "rColumn": [],
+        "condition": [],
+        "relation": "inSec"
+    }
+}
