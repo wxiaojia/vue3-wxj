@@ -1,0 +1,95 @@
+{
+    "option": [{
+        "title": {
+            "text": "性别",
+            "subtext": "",
+            "x": "center"
+        },
+        "color": ["#4769ea", "#f3e378", "#ff7f3a", "#2fc1f2", "#fffdef", "#9e4ff7", "#fce03f", "#b6c1e0", "#fff9cf", "#878aa3"],
+        "tooltip": {
+            "trigger": "item",
+            "formatter": "{b} : {c} ({d}%)"
+        },
+        "legend": {
+            "orient": "vertical",
+            "left": "left",
+            "data": ["a", "b"]
+        },
+        "series": [{
+            "name": "性别",
+            "type": "pie",
+            "radius": "55%",
+            "center": ["50%", "60%"],
+            "data": [{
+                "value": 6,
+                "name": "a"
+            }, {
+                "value": 10,
+                "name": "b"
+            }],
+            "itemStyle": {
+                "emphasis": {
+                    "shadowBlur": 10,
+                    "shadowOffsetX": 0,
+                    "shadowColor": "rgba(0, 0, 0, 0.5)"
+                }
+            }
+        }]
+    }, {
+        "title": {
+            "text": "户籍地分布展示",
+            "subtext": "",
+            "x": "center"
+        },
+        "grid": {
+            "x": 100,
+            "y": 60,
+            "x2": 40,
+            "y2": 40
+        },
+        "color": ["#5553ce"],
+        "tooltip": {
+            "trigger": "axis",
+            "formatter": "{b}:{c}",
+            "axisPointer": {
+                "type": "shadow"
+            }
+        },
+        "xAxis": {
+            "type":"value"
+        },
+        "yAxis": {
+            "type":"category",
+            "data": []
+        },
+        "series":[{
+            "data": [],
+            "type":"bar"
+        }]
+    }, {
+        "title": {
+            "text": "时间段分布统计",
+            "subtext": "",
+            "x": "center"
+        },
+        "color": ["#32a4ff"],
+        "tooltip": {
+            "trigger": "axis",
+            "formatter": "{b}:{c}",
+            "axisPointer": {
+                "type": "shadow"
+            }
+        },
+        "xAxis": {
+            "type":"category",
+            "data": []
+        },
+        "yAxis": {
+            "type":"value"
+        },
+        "series":[{
+            "data": [],
+            "type":"bar"
+        }]
+    }]
+}
