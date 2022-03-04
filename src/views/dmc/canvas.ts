@@ -9,8 +9,5 @@ export function useCanvas () {
         return arr
     }
 
-    
-   
-
     return { isExitGridId,  }
 }
