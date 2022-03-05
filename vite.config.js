@@ -5,9 +5,33 @@ import path from "path";
 
 import postcssImport from "postcss-import"
 import tailwindcss from 'tailwindcss'
+// import { createHtmlPlugin } from 'vite-plugin-html'
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue(),
+    // createHtmlPlugin({
+    //   inject: {
+    //     data: {
+    //       htmlWebpackPlugin: { // 取和 webpack 插件同名的对象 key，即可           
+    //         options: {             
+    //             isVite: true,             
+    //         }         
+    //       },         
+    //     },
+    //   },
+    // })
+  //   injectHtml({ // 入口文件 index.html 的模板注入       
+  //     injectData: { // 模板注入的数据         
+  //         htmlWebpackPlugin: { // 取和 webpack 插件同名的对象 key，即可           
+  //             options: {             
+  //                 isVite: true,             
+  //             }         
+  //         },         
+  //         title: 'vite+webpack'       
+  //     },     
+  // })
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
