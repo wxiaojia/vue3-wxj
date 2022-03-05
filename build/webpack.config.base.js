@@ -121,6 +121,7 @@ module.exports = {
             template: './index.html',
             filename: 'index.html',
             inject: 'body',     // 将添加的script添加到body中
+            isVite: false // 添加标识 
         }),
         new VueLoaderPlugin(),
          // 抽离css文件

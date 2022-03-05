@@ -50,7 +50,6 @@
 <script lang='ts' setup>
 import { computed, withDefaults, ref } from 'vue'
 
-const isClose = ref(false)
 
 interface TreeDate {
     name: string,
@@ -63,14 +62,17 @@ interface Mapping {
 interface Props{
     treeData: TreeDate,
     mapping?: Mapping,
-    dragCallback?: Function
+    dragCallback?: Function,
+    isOpenRoot?: Boolean
 }
 // 设置props默认值
 const props = withDefaults(defineProps<Props>(), {
     treeData: () => ({}),
     mapping: () => ({ title: 'name', children: 'children'}),
-    dragCallback: () => {}
+    dragCallback: () => {},
+    isOpenRoot: false
 })
+const isClose = ref(props.isOpenRoot)
 
 const isChildren = computed(() => {
     const { mapping, treeData } = props
