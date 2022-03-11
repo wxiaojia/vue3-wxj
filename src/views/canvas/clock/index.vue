@@ -10,7 +10,7 @@ import createClock from './clock.js'
 import { onMounted } from 'vue';
 
 onMounted(() => {
-    createClock()
+    window.requestAnimationFrame(createClock);
 })
 
 </script>

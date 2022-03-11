@@ -14,7 +14,7 @@ const drawWatermark = (el: HTMLElement, value: Value) => {
         font = '16px Microsoft JhengHei',
         textColor = 'rgba(180, 180, 180, 0.3)',
         text = 'wxj干巴爹',
-      } = value
+    } = value
 
     // 创建一个canvas画布
     const canvas = document.getElementById('canvasId') as HTMLCanvasElement

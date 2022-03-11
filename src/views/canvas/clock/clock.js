@@ -1,11 +1,12 @@
-// 画一个⏰，
+// 画一个⏰，，
+// 用了window.requestAniamtionFrame()
 export default function createClock() {
     const canvasClock = document.getElementById('canvasClock')
-    console.log(canvasClock)
+    // console.log(canvasClock)
     const ctx = canvasClock.getContext('2d')
-    console.log(ctx)
+    // console.log(ctx)
 
-    setInterval(() => {
+    // setInterval(() => {
         ctx.save()
         ctx.clearRect(0, 0, 300, 300)
         ctx.translate(150, 150) // 设置中心点，此时300，300变成了坐标的0，0
@@ -93,5 +94,7 @@ export default function createClock() {
 
         ctx.restore()
         ctx.restore()
-    }, 1000)
+    // }, 1000)
+
+    window.requestAnimationFrame(createClock)
 }

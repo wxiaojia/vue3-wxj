@@ -30,7 +30,11 @@ takeRecords()
 const targetNode = document.getElementById('some-id');
 
 // 观察器的配置（需要观察什么变动）
-const config = { attributes: true, childList: true, subtree: true };
+const config = { 
+    attributes: true, // 属性的变动
+    childList: true, //子元素的变动
+    subtree: true   // 所有下属节点（包括子节点和子节点的子节点）的变动
+};
 
 // 当观察到变动时执行的回调函数
 const callback = function(mutationsList, observer) {

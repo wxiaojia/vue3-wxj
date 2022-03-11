@@ -44,7 +44,8 @@ module.exports = {
             'utils': resolve('src/utils'),
             'components': resolve('src/components'),
             'directive': resolve('src/utils/directive'),
-            'assets': resolve('src/assets')
+            'assets': resolve('src/assets'),
+            'image': resolve('src/assets/img')
         },
     },
     module: {

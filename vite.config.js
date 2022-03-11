@@ -38,7 +38,8 @@ export default defineConfig({
       'utils': path.resolve(__dirname, './src/utils'),
       'components': path.resolve(__dirname, './src/components'),
       'directive': path.resolve(__dirname, './src/utils/directive'),
-      'assets': path.resolve(__dirname, './src/assets')
+      'assets': path.resolve(__dirname, './src/assets'),
+      'image':  path.resolve(__dirname, './src/assets/img')
     },
   },
   css: {

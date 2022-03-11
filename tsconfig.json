@@ -12,12 +12,14 @@
       "forkChecker": true,
       "useWebpackText": true
     },
+    // 是否在保存的时候自动编译，一般项目会有rollup或webpack等构建工具，并且使用热更新，所以这里不用打开
     "compileOnSave": false,
     "buildOnSave": false,
     "compilerOptions": {
-     // 与 Vue 的浏览器支持保持一致
+     // 与 Vue 的浏览器支持保持一致，编译的目标代码
       "target": "es5",
       // 如果使用 webpack 2+ 或 rollup，可以利用 tree-shake: es2015 commonjs
+      // tsc编译后用那种模块化方案
       "module": "es2015",
       "allowSyntheticDefaultImports": true,
       // 这可以对 `this` 上的数据 property 进行更严格的推断
@@ -28,6 +30,7 @@
         "source-map",
         "webpack"
       ],
+      // baseUrl与path是成对存在的，设置模块名或路径映射列表
       "baseUrl": "./src",
       "emitDecoratorMetadata": true,
       "experimentalDecorators": true,
@@ -37,6 +40,7 @@
       "sourceMap": true,
       "strictNullChecks": false,
       "paths": {},
+      // lib指明，比如说引入在dom浏览器环境下的一些默认类型定义，使用window\document对象浏览器环境中的对象的时候，ts在运行以及编译时就不会有类型报错
       "lib": [
           "dom",
           "es6"

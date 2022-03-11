@@ -28,6 +28,12 @@ const aboutCss = {
         meta: {title: '图形', roles: ['admin']},
         component: () => import( '@/views/css-resize/strangeShapes.vue')
       },
+      {
+        path: 'pubuliu',
+        name: 'pubuliu',
+        meta: {title: '瀑布流', roles: ['admin']},
+        component: () => import( '@/views/css-resize/pubuliu.vue')
+      }
     ]
   }
 
