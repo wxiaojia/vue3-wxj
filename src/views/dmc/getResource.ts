@@ -1,6 +1,6 @@
 import util from './util.js'
 
-export default function useGetResource(state) {
+export default function useGetResource(state, canvasParam) {
     // 获取当前位置的坐标的资源
     const getCoordinateResource = (coordinate = {x: 0, y: 0}, isClick = false) => {
     // console.log(coordinate)
@@ -49,7 +49,7 @@ const getCoordinateResourceRelation = (moveCoordinate, coordinate = {x:0, y: 0},
             continue
           }
         } else {
-          if (getDataRelactionId(state.canvasParam.oldLineLocation.startId) === arr[i]) {
+          if (getDataRelactionId(canvasParam.oldLineLocation.startId) === arr[i]) {
             continue
           }
         }

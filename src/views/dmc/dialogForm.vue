@@ -1,9 +1,11 @@
 <template>
  <el-dialog v-model="props.dialogFormVisible" title="选择操作类型" ref='dataOpe'>
-      <el-select v-model="opeType" placeholder="选择操作类型">
-        <el-option label="+" value="+"></el-option>
-        <el-option label="-" value="-"></el-option>
-      </el-select>
+    <div>
+      <el-radio v-model="opeType" label="1" size="large">+</el-radio>
+      <el-radio v-model="opeType" label="2" size="large">-</el-radio>
+      <el-radio v-model="opeType" label="3" size="large">*</el-radio>
+      <el-radio v-model="opeType" label="4" size="large">/</el-radio>
+    </div>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="cancelOpe">Cancel</el-button>
@@ -23,11 +25,18 @@ let opeType = ref('')
 const props = defineProps({
     dialogFormVisible: Boolean,
 })
+
+const changeValue = (val) => {
+  console.log(val)
+
+}
+// select__popper
+
 const cancelOpe = () => {
     opeType.value = ''
     emit('cancelOpe')
 }
 const sureOpe = () => {
-    emit('sureOpe'. opeType.value)
+    emit('sureOpe', opeType.value)
 }
 </script>

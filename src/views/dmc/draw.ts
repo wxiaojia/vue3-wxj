@@ -2,26 +2,26 @@ import Circle from './class/filter.js'
 import myCanvas from './canvasUtil.js'
 import analysParam from './json/analysParam.json'
 
-export default function usedDraw (state) {
+export default function usedDraw (state, canvasParam) {
     
     // 初始化：画圆圈
     type DrawCircle = ({x, y}: ({x: number, y: number}), isInit?: number) => void
     const drawCircle: DrawCircle = ({x , y}, isInit = 1) => {
         let cir = new Circle({x, y})
         //   isInit && state.resource.push(cir) // 记录起来，判断是否重叠
-            // console.log(state.canvasParam.ctx)
-        state.canvasParam.ctx.beginPath()
-        state.canvasParam.ctx.fillStyle = '#1a95e9'
-        state.canvasParam.ctx.arc(x, y, cir.radius, 0, 2 * Math.PI)
-        state.canvasParam.ctx.fill()
-        state.canvasParam.ctx.font = cir.font
-        state.canvasParam.ctx.fillStyle = cir.fillStyle
-        state.canvasParam.ctx.textAlgin = cir.textAlgin
-        state.canvasParam.ctx.textBaseInline = cir.textBaseInline
+            // console.log(canvasParam.ctx)
+        canvasParam.ctx.beginPath()
+        canvasParam.ctx.fillStyle = '#1a95e9'
+        canvasParam.ctx.arc(x, y, cir.radius, 0, 2 * Math.PI)
+        canvasParam.ctx.fill()
+        canvasParam.ctx.font = cir.font
+        canvasParam.ctx.fillStyle = cir.fillStyle
+        canvasParam.ctx.textAlgin = cir.textAlgin
+        canvasParam.ctx.textBaseInline = cir.textBaseInline
         //   此处没有考虑多行，这是两行的
-        state.canvasParam.ctx.fillText(cir.filterText[0], x - cir.radius / 2, y - cir.radius / 4 * 1)
-        state.canvasParam.ctx.fillText(cir.filterText[1], x - cir.radius / 2, y + cir.radius / 4 * 2)
-        state.canvasParam.ctx.closePath()
+        canvasParam.ctx.fillText(cir.filterText[0], x - cir.radius / 2, y - cir.radius / 4 * 1)
+        canvasParam.ctx.fillText(cir.filterText[1], x - cir.radius / 2, y + cir.radius / 4 * 2)
+        canvasParam.ctx.closePath()
         
     }
 

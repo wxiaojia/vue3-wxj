@@ -2,23 +2,23 @@ import util from './util.js'
 import Circle from './class/filter.js'
 
 
-export default function useInitCanvas(state, canvasContextmenu) {
+export default function useInitCanvas(state, canvasContextmenu, canvasParam) {
     // 初始化 画布的大小
     const initCanvasParam = () => {
         const canvasOut = document.getElementById('canvasOut') as HTMLElement
-        state.canvasParam.w = canvasOut.clientWidth
-        state.canvasParam.h = canvasOut.clientHeight
-        state.canvasParam.left = canvasOut.offsetLeft
-        state.canvasParam.top = canvasOut.offsetTop
+        canvasParam.w = canvasOut.clientWidth
+        canvasParam.h = canvasOut.clientHeight
+        canvasParam.left = canvasOut.offsetLeft
+        canvasParam.top = canvasOut.offsetTop
 
         state.canvas = document.getElementById('canvas')
-        state.canvas.width = state.canvasParam.w
-        state.canvas.height = state.canvasParam.h
+        state.canvas.width = canvasParam.w
+        state.canvas.height = canvasParam.h
 
-        state.canvasParam.ctx = state.canvas.getContext('2d')
+        canvasParam.ctx = state.canvas.getContext('2d')
 
         state.gridArr = []
-        state.gridArr = util.changeGridSize(state.gridArr, {w: state.canvasParam.w, h: state.canvasParam.h})
+        state.gridArr = util.changeGridSize(state.gridArr, {w: canvasParam.w, h: canvasParam.h})
         // initCanvas()
 
         state.canvas.addEventListener('contextmenu', canvasContextmenu, false)

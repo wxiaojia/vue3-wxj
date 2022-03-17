@@ -154,25 +154,62 @@ export default {
      * @returns 
      */
     createConditionCanvas (option) {
-        const condition = analysParam.module.condition[0]
+        let condition
+        if (option.type === 7) {
+            condition = analysParam.module.condition[0]
+        } else if (option.type === 8 && option.echo.type === 0) {
+            condition = analysParam.module.conditionOther
+        } else {
+            condition = analysParam.module.condition[option.echo.type]
+        }
+
+        let w = option.scope[2],
+            h = option.scope[3]
+        if (option.lineCoordinate && option.lineCoordinate.length > 0) {
+            w += 40
+            if (option.lineCoordinate.length > 1 && option.type === 7) {
+                w += 100
+            }
+        }
+        let canvasObj = this.createCanvas({
+            w, h,
+            isTransparent: true
+        })
         const {
             dataFilterFontParam,
-            w, h, font, x, y, r, 
+            font, x, y, r, 
             fontParam, closeCircular,
             closeLine
         } = condition
-        let canvasObj = this.createCanvas({
-            w: option.scope[2],
-            h: option.scope[3],
-            isTransparent: true
-        })
+
         let ctx = canvasObj.ctx
 
         let lineLength = 0
-        let xl = w + lineLength + 10, yl = h / 2
-        this.fillText(ctx, dataFilterFontParam[0], dataFilterFontParam[0].text, xl, yl - 15)
-        this.fillText(ctx, dataFilterFontParam[1], dataFilterFontParam[1].text, xl, yl + 15)
+        if (option.lineCoordinate && option.lineCoordinate.length > 0) {
+            for (let data of option.lineCoordinate) {
+                this.drawLine(ctx, data)
+            }
+            lineLength = 40
+        }
 
+        if (option.type === 7) {
+            let x = w + lineLength + 10, y = h / 2
+            this.fillText(ctx, dataFilterFontParam[0], dataFilterFontParam[0].text, x, y - 15)
+            this.fillText(ctx, dataFilterFontParam[1], dataFilterFontParam[1].text, x, y + 15)
+
+            // switch(option.echo.type) {
+            //     case 1:
+            //         this.fillText(ctx, dataFilterFontParam[0], dataFilterFontParam[0].text, x, y - 15)
+            //         this.fillText(ctx, dataFilterFontParam[1], dataFilterFontParam[1].text, x, y + 15)
+            //         break;
+            //     case 2:
+            //         this.fillText(ctx, dataFilterFontParam[0], dataFilterFontParam[0].text, x, y - 15)
+            //         break;
+            //     case 3:
+            //         this.fillText(ctx, dataFilterFontParam[1], dataFilterFontParam[1].text, x, y - 15)
+            //         break;
+            // }
+        }
         ctx.beginPath()
         ctx.font = font
         ctx.fillStyle = '#1a95e9'
@@ -185,12 +222,15 @@ export default {
         ctx.fillText(text[0], lineLength + x, y)
         ctx.closePath()
 
-        // 画关闭的圆
-        ctx.strokeStyle = closeCircular.strokeStyle
-        this.drawCircular(ctx, closeCircular)
+        if ((option.type === 7 && option.lineCoordinate && option.lineCoordinate.length === 0) || (option.type === 8 && option.echo.column.length === 0)) {
+            // 画关闭的圆
+            ctx.strokeStyle = closeCircular.strokeStyle
+            this.drawCircular(ctx, closeCircular)
 
-        // X 画线
-        this.closeX(ctx, closeLine)
+            // X 画线
+            this.closeX(ctx, closeLine)
+        }
+        
         return canvasObj.canvas
     },
     /**
@@ -349,5 +389,180 @@ export default {
         ctx.closePath()
         ctx.stroke()
         ctx.fill()
-    }
+    },
+        /**
+     * 获取新的canvas
+     * @param {Number} type 新canvas的类型 1 关联关系的结果集 2 数据过滤、数据统计
+     * @param {Object} obj 要生成canvas的相关对象
+     * @return {Object} 新的canvas和对应的范围坐标
+     */
+        getNewCanvas (self, type, obj) {
+        if (type === 1) {
+            let start = {
+                x: Math.min(obj.lDataRelation.scope[0], obj.rDataRelation.scope[0]),
+                y: Math.min(obj.lDataRelation.scope[1], obj.rDataRelation.scope[1])
+            }
+            let x = Math.min(obj.lDataRelation.scope[0], obj.rDataRelation.scope[0])
+            let y = Math.min(obj.lDataRelation.scope[1], obj.rDataRelation.scope[1])
+            let w = Math.max(obj.lDataRelation.scope[0] + obj.lDataRelation.scope[2], obj.rDataRelation.scope[0] + obj.rDataRelation.scope[2]) - x
+            let h = Math.max(obj.lDataRelation.scope[1] + obj.lDataRelation.scope[3], obj.rDataRelation.scope[1] + obj.rDataRelation.scope[3]) - y
+            let relationImg
+            // 资源相加
+            if (obj.relation.type === 9) {
+                relationImg = analysParam.resourceAdd
+            } else {
+                // 关联关系
+                relationImg = analysParam.relation[obj.relation.rType]
+                let hAdd = obj.relation.marginT + relationImg.h / 2 - h / 2
+                if (hAdd > 0) {
+                    h += hAdd
+                }
+            }
+            w += 120 + relationImg.w + analysParam.module.resultSet.w
+            let canvasObj = this.createCanvas({
+                w: w,
+                h: h,
+                // fillStyle: 'blue'
+                isTransparent: true
+            })
+            if (obj.lModule.type === 4) {
+                this.drawCanvas(canvasObj.ctx, obj.lDataRelation.canvas, {
+                    sx: 0,
+                    sy: 0,
+                    sw: obj.lDataRelation.scope[2],
+                    sh: obj.lDataRelation.scope[3],
+                    x: obj.lDataRelation.scope[0] - start.x,
+                    y: obj.lDataRelation.scope[1] - start.y,
+                    w: obj.lDataRelation.scope[2],
+                    h: obj.lDataRelation.scope[3]
+                })
+            } else {
+                this.drawCanvas(canvasObj.ctx, obj.lDataRelation.canvas, {
+                    sx: 0,
+                    sy: 0,
+                    sw: obj.lModule.scope[2],
+                    sh: obj.lModule.scope[3],
+                    x: obj.lModule.scope[0],
+                    y: obj.lModule.scope[1],
+                    w: obj.lModule.scope[2],
+                    h: obj.lModule.scope[3]
+                })
+            }
+            if (obj.rModule.type === 4) {
+                this.drawCanvas(canvasObj.ctx, obj.rDataRelation.canvas, {
+                    sx: 0,
+                    sy: 0,
+                    sw: obj.rDataRelation.scope[2],
+                    sh: obj.rDataRelation.scope[3],
+                    x: obj.rDataRelation.scope[0] - start.x,
+                    y: obj.rDataRelation.scope[1] - start.y,
+                    w: obj.rDataRelation.scope[2],
+                    h: obj.rDataRelation.scope[3]
+                })
+            } else {
+                this.drawCanvas(canvasObj.ctx, obj.rDataRelation.canvas, {
+                    sx: 0,
+                    sy: 0,
+                    sw: obj.rModule.scope[2],
+                    sh: obj.rModule.scope[3],
+                    x: obj.rModule.scope[0],
+                    y: obj.rModule.scope[1],
+                    w: obj.rModule.scope[2],
+                    h: obj.rModule.scope[3]
+                })
+            }
+            if (obj.relation.type === 9) {
+                this.drawCanvas(canvasObj.ctx, this.createResourceAddCanvas(self, obj.relation), {
+                    sx: 0,
+                    sy: 0,
+                    sw: obj.relation.scope[2],
+                    sh: obj.relation.scope[3],
+                    x: obj.relation.scope[0],
+                    y: obj.relation.scope[1],
+                    w: obj.relation.scope[2],
+                    h: obj.relation.scope[3]
+                })
+            } else {
+                this.drawCanvas(canvasObj.ctx, this.createRelationCanvas(self, obj.relation), {
+                    sx: 0,
+                    sy: 0,
+                    sw: obj.relation.scope[2] + obj.relation.marginR,
+                    sh: obj.relation.scope[3],
+                    x: obj.relation.scope[0],
+                    y: obj.relation.scope[1],
+                    w: obj.relation.scope[2] + obj.relation.marginR,
+                    h: obj.relation.scope[3]
+                })
+            }
+            this.drawCanvas(canvasObj.ctx, this.createResultSetCanvas(obj.resultSet), {
+                sx: 0,
+                sy: 0,
+                sw: obj.resultSet.scope[2],
+                sh: obj.resultSet.scope[3],
+                x: obj.resultSet.scope[0],
+                y: obj.resultSet.scope[1],
+                w: obj.resultSet.scope[2],
+                h: obj.resultSet.scope[3]
+            })
+            return {
+                canvas: canvasObj.canvas,
+                scope: [x, y, w, h]
+            }
+        } else {
+            console.log('obj', obj)
+
+            let canvasObj = this.createCanvas({
+                w: obj.w,
+                h: obj.h,
+                // fillStyle: 'red'
+                isTransparent: true
+            })
+            if (obj.beginModule.type === 4) {
+                this.drawCanvas(canvasObj.ctx, obj.beginDataRelation.canvas, {
+                    sx: 0,
+                    sy: 0,
+                    sw: obj.beginDataRelation.scope[2],
+                    sh: obj.beginDataRelation.scope[3],
+                    x: 0,
+                    y: 0,
+                    w: obj.beginDataRelation.scope[2],
+                    h: obj.beginDataRelation.scope[3]
+                })
+            } else {
+                this.drawCanvas(canvasObj.ctx, obj.beginDataRelation.canvas, {
+                    sx: 0,
+                    sy: 0,
+                    sw: obj.beginDataRelation.scope[2],
+                    sh: obj.beginDataRelation.scope[3],
+                    x: obj.beginModule.scope[0],
+                    y: obj.beginModule.scope[1],
+                    w: obj.beginDataRelation.scope[2],
+                    h: obj.beginDataRelation.scope[3]
+                })
+            }
+            this.drawCanvas(canvasObj.ctx, obj.condition.canvas, {
+                sx: 0,
+                sy: 0,
+                sw: obj.condition.scope[2],
+                sh: obj.condition.scope[3],
+                x: obj.condition.scope[0],
+                y: obj.condition.scope[1],
+                w: obj.condition.scope[2],
+                h: obj.condition.scope[3]
+            })
+            this.drawCanvas(canvasObj.ctx, this.createResultSetCanvas(obj.resultSet), {
+                sx: 0,
+                sy: 0,
+                sw: obj.resultSet.scope[2],
+                sh: obj.resultSet.scope[3],
+                x: obj.resultSet.scope[0],
+                y: obj.resultSet.scope[1],
+                w: obj.resultSet.scope[2],
+                h: obj.resultSet.scope[3]
+            })
+            return {
+                canvas: canvasObj.canvas
+            }
+        }
+    },
 }

@@ -40,20 +40,21 @@
       </section>
     </section>
     <!-- 操作条件框 -->
-    <dialogFrom :dialogFormVisible='dialogFormVisible' @cancelOpe='cancelOpe'></dialogFrom>
+    <dialogFrom :dialogFormVisible='dialogFormVisible' @cancelOpe='cancelOpe' @sureOpe='sureOpe'></dialogFrom>
 
 </template>
 
 <script lang='ts' setup>
 import { ElMessageBox } from 'element-plus'
 
-import { onMounted, ref, reactive, computed, watch } from "vue"
+import { onMounted, ref, reactive, computed, watch, toRefs } from "vue"
 import Tree from 'components/Tree/Tree.vue'
 import dialogFrom from './dialogForm.vue'
 
 import list from './mock/list'
 import string from 'utils/common/string.js'
 import array from 'utils/common/array.js'
+import formula from 'utils/common/formula.ts'
 import dataSourceJson from './json/dataSource.json'
 import analysParam from './json/analysParam.json'
 import resultSetJSON from './json/resultSet.json'
@@ -66,21 +67,22 @@ import useGrid from './grid.ts'
 import usedDraw from './draw.ts'
 import useGetResource from './getResource.ts'
 import useMouseEvent from './mouseEvent.ts'
+
+import { EventParam } from './param.ts'
 // import useVirtualScroll from "element-plus/lib/el-virtual-list/src/useVirtualScroll"
 // import { CommonProps } from "element-plus/lib/el-cascader-panel"
 import { result } from 'lodash'
+import { log } from 'console'
 
 const treeList = ref({
   name: '全部',
   children: list
 })
-let  dialogFormVisible = ref(false)  // 选择操作弹框
-
-const isInner = ref(false)      // 是否在该div中拖拽的
-const isChangeDragAndDrop = ref(false)      // 是否在该div中拖拽的
-const openModel = ref({})       // 目前打开操作的标签
-const resultKey = ref('1')      // 结果集key,
-const runState = {
+let  dialogFormVisible = ref<boolean>(false)         // 选择操作弹框
+const isChangeDragAndDrop = ref<boolean>(false)      // 是否在该div中拖拽的
+const openModel = ref({})       // 目前打开操作的标签(还没完成)
+const resultKey = ref('1')      // 结果集key,为什么是字符串
+const runState = {              // 结果集的生成状态，可以减少
   0: '未运行',
   10: '等待运行',
   20: '正在运行',
@@ -89,16 +91,16 @@ const runState = {
   50: '正常结束'
 }
 const leftSide = 300  // 左侧导航菜单的宽度（用处：拖动资源的时候放置需要，如果左侧搜索则是不一样的值）
-const isMove = ref(false) // Q:这个move和下面的 eventParam.isMove 有什么区别 A:是否为有效，如果差距为0，为无效，不为0，移动跟画线都为true
+const isMove = ref<boolean>(false) // Q:这个isMove和下面的 eventParam.isMove 有什么区别 A:是否为有效，如果差距为0，为无效，不为0，移动跟画线都为true
 // 鼠标事件
 const eventParam = reactive({
-  isContextMenu: false,
+  isContextMenu: false,   // 右键的菜单
   isMove: false,
-  isOver: false,
-  mouseDownBeginTime: 0,   // 记录开始点击时间， why??
-  isDrawLine: false,
-  isMouseDown: false,
-})
+  isOver: false,          // ？
+  mouseDownBeginTime: 0,  // 记录开始点击时间， why??
+  isDrawLine: false,      // 是否划线
+  isMouseDown: false,     // 是否点击下去
+})  
 
 // 右键
 const contextMenu = reactive({
@@ -106,12 +108,11 @@ const contextMenu = reactive({
     type: 0,
     state: '0'
   },
-  isShow: false,
-  style: {
-    top: 0,
-    left: 0
+  isShow: false,  // 是否可显示
+  style: {      // 样式
+    top: '0',
+    left: '0'
   },
-  isMouseDown: false,
 })
 // 是否可以停止分析
 const isStopAnalys = computed(() => {
@@ -147,46 +148,56 @@ const modelConfig = reactive({
   w: 0,
   h: 0,
   resource: {},
-  rIdMapping: '',   //??
+  rIdMapping: '',   //
   moduleKey: 0,     
   isNowModel: true,   // 是否为现在打开的模型
-  countMapping: 0,  // ??
-  stepIdMapping: 0 // ??
+  countMapping: 0,  // 
+  stepIdMapping: 0 // 
 })
 
-
+const canvasParam = reactive({
+      ctx: null,
+      w: 0,
+      h: 0,
+      left: 0,
+      top: 0,
+      // 画线上一点的坐标位置id
+      oldLineLocation: {
+          startId: '',    // 拉线开始的组件id
+          endId: ''       // 拉线结束后的组件id
+      }
+  })
+  
+interface Path {
+  id: string,
+  path: string
+}
+interface dataRelation {
+  id: string,
+  relation: Path[],
+  scope: any[]
+}
 const state = reactive({
     lineCoordinate: [],   // 画线的坐标  
-    dataRelation: {},
+    dataRelation: {},     // 存储画布上的结果资源
     moduleKey: 0,
     dataSource: [],     // 拖动的元素（如果是一整块，是多个吗？）
-    resource: new Map(),       // 存放已放入的资源
+    resource: new Map(),   // 存放已放入的资源（all）
     ctx: null,
     canvas: null,
     xl: 0,              // 现有的栅栏布局个数（横向）
     gridArr: [],        // 画布栅格化数组 size * size
     size: 500,
-    canvasParam: {
-        ctx: null,
-        w: 0,
-        h: 0,
-        left: 0,
-        top: 0,
-        // 画线上一点的坐标位置id
-        oldLineLocation: {
-            startId: '',
-            endId: ''
-        }
-    }
 })
+
 // 点击右键
 const canvasContextmenu = (e: MouseEvent) => {
   getOffset()
   // 获取当前经纬度
   // 获取当前点击的对象，通过gridArr来拿
    // 当前鼠标在画布中的坐标
-  let x = e.pageX - state.canvasParam.left - leftSide
-  let y = e.pageY - state.canvasParam.top
+  let x = e.pageX - canvasParam.left - leftSide
+  let y = e.pageY - canvasParam.top
   let resouceObj = getCoordinateResource({x, y}, true)
   console.log('右键点击的资源', resouceObj, x, y)
   if (resouceObj === null) return
@@ -200,13 +211,13 @@ const canvasContextmenu = (e: MouseEvent) => {
 }
 // =====================整理========================
 // 初始化
-const { initCanvasParam, initFilterCanvas } = useInitCanvas(state, canvasContextmenu)
+const { initCanvasParam, initFilterCanvas } = useInitCanvas(state, canvasContextmenu, canvasParam)
 // 关于grid
 const { deleteGridArr, changeGridArr} = useGrid(state)
 // 画图形
-const { drawCircle, drawDataSource, drawCondition, drawResultSet, drawImg } = usedDraw(state)
+const { drawCircle, drawDataSource, drawCondition, drawResultSet, drawImg } = usedDraw(state, canvasParam)
 // 关于获取当前资源
-const { getCoordinateResource, getCoordinateResourceRelation, getDataRelactionId } = useGetResource(state)
+const { getCoordinateResource, getCoordinateResourceRelation, getDataRelactionId } = useGetResource(state, canvasParam)
 // mouse事件,canvas？
 const { } = useMouseEvent()
 onMounted(() => {
@@ -215,18 +226,20 @@ onMounted(() => {
 })
 
 // 操作类型选择弹窗
-const sureOpe = () => {
+const sureOpe = (opeType: string) => {
   // dialogFormVisible.value = false 
   // 成功提交cb(成功后提交返回的一些信息, 条件)
   let data = {
     stepId: '我是步骤的id',
     resourceName: '结果集',
     resourceId: resultKey,
-    parentId: state.canvasParam.oldLineLocation.startId,
+    parentId: canvasParam.oldLineLocation.startId,
   }
   resultKey.value = resultKey.value + '' + Math.random() * 100 
   let param = {
-    pId: state.canvasParam.oldLineLocation.startId,
+    type: 1,
+    column: [],
+    pId: canvasParam.oldLineLocation.startId,
     opeType: opeType
   }
 
@@ -234,8 +247,8 @@ const sureOpe = () => {
       dialogFormVisible.value = false
 
       param = param || {}
-      param.lId = state.canvasParam.oldLineLocation.startId
-      param.rId = state.canvasParam.oldLineLocation.endId
+      param.lId = canvasParam.oldLineLocation.startId
+      param.rId = canvasParam.oldLineLocation.endId
       clearCanvasMoveAndDrawLine()
       // 生成结果
       chooseCondition(data, param, isNew)
@@ -244,11 +257,13 @@ const sureOpe = () => {
   }
   cb(data, param, true)
 }
+
 const cancelOpe = (cb: any) => {
   dialogFormVisible.value = false
   clearCanvasMoveAndDrawLine()
   window.requestAnimationFrame(initCanvas)
 }
+
 // =====================整理完毕========================
 
 // ===============目前还没调用==============================
@@ -261,8 +276,8 @@ const updateModelConfig = () => {
   }
   modelConfig.dataRelation = dataRelation
   modelConfig.resource = util.mapToJson(state.resource)
-  modelConfig.w = state.canvasParam.w
-  modelConfig.h = state.canvasParam.h
+  modelConfig.w = canvasParam.w
+  modelConfig.h = canvasParam.h
 
   // console.log(modelConfig)
 }
@@ -274,8 +289,8 @@ const initIdAndNum = () => {
   // rsNum = 1
   state.dataRelation = {}
   state.gridArr = []
-  state.xl = Math.floor(state.canvasParam.w)
-  util.changeGridSize(state.gridArr, {w: state.canvasParam.w, h: state.canvasParam.h})
+  state.xl = Math.floor(canvasParam.w)
+  util.changeGridSize(state.gridArr, {w: canvasParam.w, h: canvasParam.h})
 }
 // ===============目前还没调用 - 结束==============================
 
@@ -283,16 +298,16 @@ const initIdAndNum = () => {
 const initCanvas = () => {
   if(window.requestAnimationFrame) {
     // 大小
-    state.canvas.width = state.canvasParam.w
-    state.canvas.height = state.canvasParam.h
+    state.canvas.width = canvasParam.w
+    state.canvas.height = canvasParam.h
     // 背景颜色
-    state.canvasParam.ctx.fillStyle = analysParam.canvas.fillStyle
+    canvasParam.ctx.fillStyle = analysParam.canvas.fillStyle
     // 清空内容
-    state.canvasParam.ctx.fillRect(0, 0, state.canvasParam.w, state.canvasParam.h)
+    canvasParam.ctx.fillRect(0, 0, canvasParam.w, canvasParam.h)
     // console.log(state.resource)
     // 开始绘画
     if(state.resource.size === 0) {
-      myCanvas.fillText(state.canvasParam.ctx, analysParam.fontParam.defaultText, '请拖动资源到画布', state.canvasParam.w / 2, state.canvasParam.h / 2)
+      myCanvas.fillText(canvasParam.ctx, analysParam.fontParam.defaultText, '请拖动资源到画布', canvasParam.w / 2, canvasParam.h / 2)
       return
     }
     // 下面这里代码重复性很高啊！！！
@@ -304,7 +319,7 @@ const initCanvas = () => {
       for (let i = 0; i < arr.length; i++) {
         if (arr[i] !== moveCoordinate.id) {
           let temp = state.dataRelation[arr[i]]
-          myCanvas.drawCanvas(state.canvasParam.ctx, temp.canvas, {
+          myCanvas.drawCanvas(canvasParam.ctx, temp.canvas, {
             sx: 0,
             sy: 0,
             sw: temp.scope[2],
@@ -317,7 +332,7 @@ const initCanvas = () => {
         }
       }
       let temp = state.dataRelation[moveCoordinate.id]
-      myCanvas.drawCanvas(state.canvasParam.ctx, temp.canvas, {
+      myCanvas.drawCanvas(canvasParam.ctx, temp.canvas, {
             sx: 0,
             sy: 0,
             sw: temp.scope[2],
@@ -334,7 +349,7 @@ const initCanvas = () => {
       let arr = Object.keys(state.dataRelation)
       for (let i = 0; i < arr.length; i++) {
           let temp = state.dataRelation[arr[i]]
-          myCanvas.drawCanvas(state.canvasParam.ctx, temp.canvas, {
+          myCanvas.drawCanvas(canvasParam.ctx, temp.canvas, {
             sx: 0,
             sy: 0,
             sw: temp.scope[2],
@@ -346,10 +361,60 @@ const initCanvas = () => {
           })
       }
     }
-    // 画箭头？？
-    // 画线？？
+    // 画箭头
+    const { x0, x1, y0, y1 } = state.lineCoordinate[0] || {}
+    if (state.lineCoordinate.length > 0 && 
+        (Math.abs(x0 - x1) > 5) ||
+        (Math.abs(y0 - y1) > 5)) {
+          // 这个是什么？
+          let canvas = document.createElement('canvas')
+          canvas.width = 40
+          canvas.height = 40
+          let ctx = canvas.getContext('2d')
+          // 求出角度
+          let angle = formula.getAngle({
+            x: state.lineCoordinate[0].x0,
+            y: state.lineCoordinate[0].y0
+          }, {
+            x: state.lineCoordinate[0].x1,
+            y: state.lineCoordinate[0].y1
+          })
+          console.log('angle', angle)
+          ctx.translate(20, 20)
+          ctx.rotate((angle - 90) * Math.PI / 180)
+          ctx.translate(-20, -20)
+          ctx.fillStyle = 'transparent'
+          // 清空内容
+          ctx.fillRect(0, 0, 40, 40)
+          myCanvas.drawLine(ctx, {
+            fillStyle: state.lineCoordinate[0].fillStyle,
+            x0: 30,
+            y0: 10,
+            x1: 20,
+            y1: 20
+          })
+          myCanvas.drawLine(ctx, {
+            fillStyle: state.lineCoordinate[0].fillStyle,
+            x0: 10,
+            y0: 10,
+            x1: 20,
+            y1: 20
+          })
+          myCanvas.drawCanvas(canvasParam.ctx, canvas, {
+            sx: 0,
+            sy: 0,
+            sw: 40,
+            sh: 40,
+            x: state.lineCoordinate[0].x1 + -20,
+            y: state.lineCoordinate[0].y1 + -20,
+            w: 40,
+            h: 40
+          })
+    }
+
+    // 画线
     for (let temp of state.lineCoordinate) {
-      myCanvas.drawLine(state.canvasParam.ctx, temp)
+      myCanvas.drawLine(canvasParam.ctx, temp)
     }
   }
 }
@@ -359,8 +424,8 @@ const clearCanvasMoveAndDrawLine = () => {
   eventParam.isMouseDown = false
   eventParam.isMove = false
   eventParam.isDrawLine = false
-  state.canvasParam.oldLineLocation.startId = ''
-  state.canvasParam.oldLineLocation.endId = ''
+  canvasParam.oldLineLocation.startId = ''
+  canvasParam.oldLineLocation.endId = ''
   state.lineCoordinate = []
   window.requestAnimationFrame(initCanvas)
 }
@@ -394,11 +459,10 @@ const getModule = (type = 1, subType?: number) => {
 // 判断是否移出了画布
 const validateMoveSite = (site: {x: number, y: number}, data: any) => {
   let status = false
-  if (data.scope[0] + site.x < 0 || data.scope[0] + data.scope[2] + site.x > state.canvasParam.w ||
-      data.scope[1] + site.y < 0 || data.scope[1] + data.scope[3] + site.y > state.canvasParam.h) {
+  if (data.scope[0] + site.x < 0 || data.scope[0] + data.scope[2] + site.x > canvasParam.w ||
+      data.scope[1] + site.y < 0 || data.scope[1] + data.scope[3] + site.y > canvasParam.h) {
         status = true
       }
-
   return status
 }
 
@@ -418,8 +482,8 @@ const canvasClick = (e: MouseEvent) => {
   getOffset()
   console.log(leftSide)
   let coordinate = {
-    x: e.pageX - state.canvasParam.left - leftSide,
-    y: e.pageY - state.canvasParam.top
+    x: e.pageX - canvasParam.left - leftSide,
+    y: e.pageY - canvasParam.top
   }
   console.log('点我了', state.gridArr)
   let resouceObj = getCoordinateResource(coordinate)
@@ -434,8 +498,8 @@ const canvasClick = (e: MouseEvent) => {
 
 const canvasMouseMove = (e: MouseEvent) => {
   getOffset()
-  let x = e.pageX - state.canvasParam.left - leftSide
-  let y = e.pageY - state.canvasParam.top
+  let x = e.pageX - canvasParam.left - leftSide
+  let y = e.pageY - canvasParam.top
 
   if (eventParam.isMove) {
     let site = {
@@ -481,36 +545,43 @@ const createResultSet = (data: any, relation: any) => {
 // 修改dataRelation.relation的path值
 const changeDataRelationPath = (relation: any[], path: string) => {
   for (let i = 0; i < relation.length; i++) {
-    let temp = relateion[i]
+    let temp = relation[i]
     temp.path = path + temp.path
   }
   return relation
 }
 
 // 圆形操作生成结果集
+// 1、创建结果集
 const chooseCondition = (data: any, param: any, isNew: boolean) => {
+  console.log(data, param, isNew)
   // 如果不是新的，要rebuildCanvas
   if(!isNew) {
     // myCanvas.rebuildCanvas([data.id])
     return
   }
 
-  // 新的创建结果集
+  // 新的创建结果集 resultSet：json文件中结果集基本信息, dataFilterImg数据过滤圈圈
   let [ resultSetImg, dataFilterImg ] = [ analysParam.module.resultSet, analysParam.module.condition[0] ]
   // 创建结果集
-  let beginDataRelation = state.dataRelation[param.lId]
-  let beginResouce = state.resource.get(param.lId)
-  let dataOpe = state.dataRelation[param.rId]
-  let dataOpeResource = state.resource.get(param.rId)
 
-  dataOpeResource.echo = param
+  console.log(state.dataRelation)   // 当前两个没成链的资源
+  // Q：state.dataRelation中取的 和 state.resource这个获取有什么不同？
+  // A：state.dataRelation 存的是{canvas, id, relation:[{id, path}], scope} ,
+  //    state.resource 存储了基本信息{key, value:{echo, id, marginT, type, scope等}}
+  // 左边：
+  let beginDataRelation = state.dataRelation[param.lId] 
+  let beginResouce = state.resource.get(param.lId)  // 左边资源
+  // 右边
+  let dataOpe = state.dataRelation[param.rId]       
+  let dataOpeResource = state.resource.get(param.rId)  // 连线的右边，即操作圆
+  
   beginResouce.isLine = false   // 只能连接一次，连接后去除这个功能
+  dataOpeResource.echo = param
 
-  console.log(state.resource) // 这里已经修改了
-  console.log(data, param)
+  console.log(data, param)  // param 连接的时候结果集信息
   let scope = [beginDataRelation.scope[0], beginDataRelation.scope[1]]
   let lineStart, addH = 0
-
   // 修改左边的资源的位置scope，获取画线开始坐标
   if (beginResouce.type === 4) {
     // 结果集（就是用结果集再去操作，结果集高度一致的）
@@ -518,6 +589,7 @@ const chooseCondition = (data: any, param: any, isNew: boolean) => {
     scope.push(beginDataRelation.scope[3])
     lineStart = util.lineStart(beginResouce)
   } else {
+    // 扩展结果集的canvas大小
     // marginT 即marginTop,是数值方向的中间点，因为要存储整条链的位置，所以会因为结果（比如上面的正常结束，异常）等文字改变了位置
     if (beginResouce.type <= 2) {
       addH = resultSetImg.marginT - analysParam.module.dataSource.marginT[beginResouce.paramType]
@@ -534,7 +606,7 @@ const chooseCondition = (data: any, param: any, isNew: boolean) => {
     lineStart = util.lineStart(beginResouce)
   }
 
-  // 右侧,操作圆的两条线, 左(0, 30) -> (40, 30) 右（）
+  // 右侧,操作圆的两条线, 左(0, 30) -> (40, 30) 右（40 + dataFilterImg.w, 30） -> (120 + dataFilterImg.w,30 )
   let y = lineStart.y
   dataOpeResource.lineCoordinate = [{
     x0: 0, y0: 30, x1: 40, y1: 30
@@ -548,13 +620,15 @@ const chooseCondition = (data: any, param: any, isNew: boolean) => {
   dataOpe.scope[2] = 120 + dataFilterImg.w
 
   dataOpeResource.scope[0] = lineStart.x
-  dataOpeResource.scope[1] = y - dataFilterImg.r
+  dataOpeResource.scope[1] = dataOpe.scope[1]
   dataOpeResource.scope[2] = 120 + dataFilterImg.w
+  console.log('line',dataOpeResource)
   let resultSet = createResultSet(data, dataOpeResource)
-
+  
   resultSet.echo.alias = beginResouce.alias
   resultSet.echo.num = beginResouce.num
   resultSet.isDataFilter = true
+  console.log(resultSet)
 
   // 关系链,画布中最后的节点（可多个）
   let path = resultSet.id + '/'
@@ -570,10 +644,35 @@ const chooseCondition = (data: any, param: any, isNew: boolean) => {
     path: addPath
   })
   delete state.dataRelation[param.rId]
-  dataRelation.relation = [ ...dataRelation.relation, changeDataRelationPath(beginDataRelation.relation, addPath)]
+  let relationData = changeDataRelationPath(beginDataRelation.relation, addPath)
+  dataRelation.relation = [ ...dataRelation.relation, ...JSON.parse(JSON.stringify(relationData))]
   delete state.dataRelation[param.lId]
 
-  let newCanvasObj = myCanvas.getNewCanvas()
+  let newCanvasObj = myCanvas.getNewCanvas(self, 2, {
+    beginModule: beginResouce,
+    beginDataRelation,
+    condition: dataOpe,
+    resultSet,
+    w: scope[2],
+    h: scope[3]
+  })
+
+  dataRelation.canvas = newCanvasObj.canvas
+  state.resource.set(resultSet.id, resultSet)
+  state.dataRelation[resultSet.id] = dataRelation
+
+  console.log(dataRelation)
+  console.log(state.resource)
+  console.log(state.dataRelation)
+
+  // // commit('changeResource', state.resource)
+  deleteGridArr([param.lId, param.rId])
+  changeGridArr(resultSet.id)
+  delete dataOpeResource.echo.lId
+  delete dataOpeResource.echo.rId
+  const [ x0, y0, x1, y1 ] = dataRelation.scope
+  changeCanvasSize(x0 + x1 > canvasParam.w, y0 + y1 > canvasParam.h)
+  // openModel.isEdit = true
 }
 
 const canvasMouseUp = (e: MouseEvent) => {
@@ -585,14 +684,14 @@ const canvasMouseUp = (e: MouseEvent) => {
     isMove.value = false
 
     getOffset()
-    let x = e.pageX - state.canvasParam.left - leftSide
-    let y = e.pageY - state.canvasParam.top
+    let x = e.pageX - canvasParam.left - leftSide
+    let y = e.pageY - canvasParam.top
 
     // 画线
     if (eventParam.isDrawLine) {
       let resouceObj = getCoordinateResourceRelation(moveCoordinate, { x, y }, 2)
 
-      if (resouceObj && resouceObj.id !== state.canvasParam.oldLineLocation.startId) {
+      if (resouceObj && resouceObj.id !== canvasParam.oldLineLocation.startId) {
           let temp = state.resource.get(resouceObj.id)  // 获取最后鼠标所在的资源信息
           console.log(temp)
           // 指向的是圆形的操作
@@ -603,7 +702,7 @@ const canvasMouseUp = (e: MouseEvent) => {
 
               return
             } 
-            state.canvasParam.oldLineLocation.endId = temp.id
+            canvasParam.oldLineLocation.endId = temp.id
             eventParam.isDrawLine = false
             // 拉线后判断是否为组件关系？？
             if (temp.type === 7) {
@@ -614,8 +713,8 @@ const canvasMouseUp = (e: MouseEvent) => {
               // sureOpe((data: any, param: any, isNew: boolean) => {
               //   console.log('我打开了吗')
               //   param = param || {}
-              //   param.lId = state.canvasParam.oldLineLocation.startId
-              //   param.rId = state.canvasParam.oldLineLocation.endId
+              //   param.lId = canvasParam.oldLineLocation.startId
+              //   param.rId = canvasParam.oldLineLocation.endId
               //   clearCanvasMoveAndDrawLine()
               //   // 生成结果
               //   chooseCondition(data, param, isNew)
@@ -669,8 +768,8 @@ const canvasMouseDown = (e: MouseEvent) => {
     getOffset()
     // 当前点击坐标
     let coordinate = {
-      x: e.pageX - state.canvasParam.left - leftSide,
-      y: e.pageY - state.canvasParam.top
+      x: e.pageX - canvasParam.left - leftSide,
+      y: e.pageY - canvasParam.top
     }
     let resouceObj = getCoordinateResource(coordinate)
     console.log('我嗯下了', resouceObj)
@@ -750,7 +849,7 @@ const canvasMouseDown = (e: MouseEvent) => {
     console.log(eventParam.isMove)
     if (eventParam.isDrawLine) {
       // 连线
-      state.canvasParam.oldLineLocation.startId = resouceObj.id
+      canvasParam.oldLineLocation.startId = resouceObj.id
       // 为什么需要这么多参数, x0,y0,初始的，x1,y1实时记录的坐标（move的时候记录）
       state.lineCoordinate.push({
         x0: coordinate.x,
@@ -784,8 +883,8 @@ const canvasMouseLeave = () => {
     // 获取canvas的信息
 const getOffset = () => {
     try {
-      state.canvasParam.top = state.canvas.parentNode.offsetTop
-      state.canvasParam.left = state.canvas.parentNode.offsetLeft
+      canvasParam.top = state.canvas.parentNode.offsetTop
+      canvasParam.left = state.canvas.parentNode.offsetLeft
     } catch (e) {
 
     }
@@ -863,18 +962,18 @@ const changeXl = (w = 0) => {
 const changeCanvasSize = (isAddW = false, isAddH = false) => {
   if (!isAddW && !isAddH) return
   let old = {
-    w: state.canvasParam.w,
-    h: state.canvasParam.h,
+    w: canvasParam.w,
+    h: canvasParam.h,
   }
   let now  = {
-    w: isAddW ? state.canvasParam.w + state.size : state.canvasParam.w,
-    h: isAddH ? state.canvasParam.h : state.canvasParam.w + state.size,
+    w: isAddW ? canvasParam.w + state.size : canvasParam.w,
+    h: isAddH ? canvasParam.h : canvasParam.w + state.size,
   }
   isAddW && changeXl(now.w)
 
   state.gridArr = util.changeGridSize(state.gridArr, now, old)
-  state.canvasParam.w = now.w
-  state.canvasParam.h = now.h
+  canvasParam.w = now.w
+  canvasParam.h = now.h
 }
 
 const drop = (e: MouseEvent) => {
@@ -893,8 +992,8 @@ const drop = (e: MouseEvent) => {
 
     getOffset()
     // 当前鼠标在画布中的坐标
-    let x = e.pageX - state.canvasParam.left - leftSide
-    let y = e.pageY - state.canvasParam.top
+    let x = e.pageX - canvasParam.left - leftSide
+    let y = e.pageY - canvasParam.top
     let item = state.dataSource[0]
     let drawDateSource = (x = 10, y = 10) => {
       const scope = [x, y, analysParam.module.dataSource.w, analysParam.module.dataSource.h[item.paramType]]
@@ -916,10 +1015,10 @@ const drop = (e: MouseEvent) => {
             break;
         }
       } else {
-        if (y + 60 < state.canvasParam.h - 60) {
+        if (y + 60 < canvasParam.h - 60) {
           y += 60
           drawDateSource(x, y)
-        } else if (x + 140 < state.canvasParam.w - 140) {
+        } else if (x + 140 < canvasParam.w - 140) {
           drawDateSource(x, y)
         } else {
           // 改变canvas的大小啦
@@ -934,11 +1033,11 @@ const drop = (e: MouseEvent) => {
     drawDateSource(x, y)
 
     // 拖进来资源，该画布编辑状态
-    openModel.value.isEdit = true
+    // openModel.value.isEdit = true
 }
 
     // 列表的拖动
-    const dragstart = (e: MouseEvent, item) => {
+    const dragstart = (e: MouseEvent, item? :any) => {
       if (!item) {
         item = {
           name: '过滤字段',  
